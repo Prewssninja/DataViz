@@ -1,734 +1,276 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 33,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "application/javascript": [
-       "\n",
-       "(function(root) {\n",
-       "  function now() {\n",
-       "    return new Date();\n",
-       "  }\n",
-       "\n",
-       "  var force = true;\n",
-       "\n",
-       "  if (typeof root._bokeh_onload_callbacks === \"undefined\" || force === true) {\n",
-       "    root._bokeh_onload_callbacks = [];\n",
-       "    root._bokeh_is_loading = undefined;\n",
-       "  }\n",
-       "\n",
-       "  if (typeof (root._bokeh_timeout) === \"undefined\" || force === true) {\n",
-       "    root._bokeh_timeout = Date.now() + 5000;\n",
-       "    root._bokeh_failed_load = false;\n",
-       "  }\n",
-       "\n",
-       "  function run_callbacks() {\n",
-       "    try {\n",
-       "      root._bokeh_onload_callbacks.forEach(function(callback) {\n",
-       "        if (callback != null)\n",
-       "          callback();\n",
-       "      });\n",
-       "    } finally {\n",
-       "      delete root._bokeh_onload_callbacks\n",
-       "    }\n",
-       "    console.debug(\"Bokeh: all callbacks have finished\");\n",
-       "  }\n",
-       "\n",
-       "  function load_libs(css_urls, js_urls, callback) {\n",
-       "    if (css_urls == null) css_urls = [];\n",
-       "    if (js_urls == null) js_urls = [];\n",
-       "\n",
-       "    root._bokeh_onload_callbacks.push(callback);\n",
-       "    if (root._bokeh_is_loading > 0) {\n",
-       "      console.debug(\"Bokeh: BokehJS is being loaded, scheduling callback at\", now());\n",
-       "      return null;\n",
-       "    }\n",
-       "    if (js_urls == null || js_urls.length === 0) {\n",
-       "      run_callbacks();\n",
-       "      return null;\n",
-       "    }\n",
-       "    console.debug(\"Bokeh: BokehJS not loaded, scheduling load and callback at\", now());\n",
-       "    root._bokeh_is_loading = css_urls.length + js_urls.length;\n",
-       "\n",
-       "    function on_load() {\n",
-       "      root._bokeh_is_loading--;\n",
-       "      if (root._bokeh_is_loading === 0) {\n",
-       "        console.debug(\"Bokeh: all BokehJS libraries/stylesheets loaded\");\n",
-       "        run_callbacks()\n",
-       "      }\n",
-       "    }\n",
-       "\n",
-       "    function on_error() {\n",
-       "      console.error(\"failed to load \" + url);\n",
-       "    }\n",
-       "\n",
-       "    for (var i = 0; i < css_urls.length; i++) {\n",
-       "      var url = css_urls[i];\n",
-       "      const element = document.createElement(\"link\");\n",
-       "      element.onload = on_load;\n",
-       "      element.onerror = on_error;\n",
-       "      element.rel = \"stylesheet\";\n",
-       "      element.type = \"text/css\";\n",
-       "      element.href = url;\n",
-       "      console.debug(\"Bokeh: injecting link tag for BokehJS stylesheet: \", url);\n",
-       "      document.body.appendChild(element);\n",
-       "    }\n",
-       "\n",
-       "    var skip = [];\n",
-       "    if (window.requirejs) {\n",
-       "      window.requirejs.config({'paths': {'plotly': 'https://cdn.plot.ly/plotly-latest.min'}});\n",
-       "      require([], function() {\n",
-       "      })\n",
-       "    }\n",
-       "    if (((window['Plotly'] !== undefined) && (!(window['Plotly'] instanceof HTMLElement))) || window.requirejs) {\n",
-       "      var urls = ['https://cdn.plot.ly/plotly-latest.min.js'];\n",
-       "      for (var i = 0; i < urls.length; i++) {\n",
-       "        skip.push(urls[i])\n",
-       "      }\n",
-       "    }\n",
-       "    for (var i = 0; i < js_urls.length; i++) {\n",
-       "      var url = js_urls[i];\n",
-       "      if (skip.indexOf(url) >= 0) { on_load(); continue; }\n",
-       "      var element = document.createElement('script');\n",
-       "      element.onload = on_load;\n",
-       "      element.onerror = on_error;\n",
-       "      element.async = false;\n",
-       "      element.src = url;\n",
-       "      console.debug(\"Bokeh: injecting script tag for BokehJS library: \", url);\n",
-       "      document.head.appendChild(element);\n",
-       "    }\n",
-       "\tif (!js_urls.length) {\n",
-       "      on_load()\n",
-       "    }\n",
-       "  };\n",
-       "\n",
-       "  function inject_raw_css(css) {\n",
-       "    const element = document.createElement(\"style\");\n",
-       "    element.appendChild(document.createTextNode(css));\n",
-       "    document.body.appendChild(element);\n",
-       "  }\n",
-       "\n",
-       "  var js_urls = [\"https://code.jquery.com/jquery-3.4.1.min.js\", \"https://cdn.plot.ly/plotly-latest.min.js\", \"https://cdn.bokeh.org/bokeh/release/bokeh-2.2.3.min.js\", \"https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.2.3.min.js\", \"https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.2.3.min.js\", \"https://unpkg.com/@holoviz/panel@^0.10.3/dist/panel.min.js\"];\n",
-       "  var css_urls = [\"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/alerts.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/card.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/dataframe.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/json.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/markdown.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/widgets.css\"];\n",
-       "\n",
-       "  var inline_js = [\n",
-       "    function(Bokeh) {\n",
-       "      Bokeh.set_log_level(\"info\");\n",
-       "    },\n",
-       "    function(Bokeh) {} // ensure no trailing comma for IE\n",
-       "  ];\n",
-       "\n",
-       "  function run_inline_js() {\n",
-       "    if ((root.Bokeh !== undefined) || (force === true)) {\n",
-       "      for (var i = 0; i < inline_js.length; i++) {\n",
-       "        inline_js[i].call(root, root.Bokeh);\n",
-       "      }} else if (Date.now() < root._bokeh_timeout) {\n",
-       "      setTimeout(run_inline_js, 100);\n",
-       "    } else if (!root._bokeh_failed_load) {\n",
-       "      console.log(\"Bokeh: BokehJS failed to load within specified timeout.\");\n",
-       "      root._bokeh_failed_load = true;\n",
-       "    }\n",
-       "  }\n",
-       "\n",
-       "  if (root._bokeh_is_loading === 0) {\n",
-       "    console.debug(\"Bokeh: BokehJS loaded, going straight to plotting\");\n",
-       "    run_inline_js();\n",
-       "  } else {\n",
-       "    load_libs(css_urls, js_urls, function() {\n",
-       "      console.debug(\"Bokeh: BokehJS plotting callback run at\", now());\n",
-       "      run_inline_js();\n",
-       "    });\n",
-       "  }\n",
-       "}(window));"
-      ],
-      "application/vnd.holoviews_load.v0+json": "\n(function(root) {\n  function now() {\n    return new Date();\n  }\n\n  var force = true;\n\n  if (typeof root._bokeh_onload_callbacks === \"undefined\" || force === true) {\n    root._bokeh_onload_callbacks = [];\n    root._bokeh_is_loading = undefined;\n  }\n\n  if (typeof (root._bokeh_timeout) === \"undefined\" || force === true) {\n    root._bokeh_timeout = Date.now() + 5000;\n    root._bokeh_failed_load = false;\n  }\n\n  function run_callbacks() {\n    try {\n      root._bokeh_onload_callbacks.forEach(function(callback) {\n        if (callback != null)\n          callback();\n      });\n    } finally {\n      delete root._bokeh_onload_callbacks\n    }\n    console.debug(\"Bokeh: all callbacks have finished\");\n  }\n\n  function load_libs(css_urls, js_urls, callback) {\n    if (css_urls == null) css_urls = [];\n    if (js_urls == null) js_urls = [];\n\n    root._bokeh_onload_callbacks.push(callback);\n    if (root._bokeh_is_loading > 0) {\n      console.debug(\"Bokeh: BokehJS is being loaded, scheduling callback at\", now());\n      return null;\n    }\n    if (js_urls == null || js_urls.length === 0) {\n      run_callbacks();\n      return null;\n    }\n    console.debug(\"Bokeh: BokehJS not loaded, scheduling load and callback at\", now());\n    root._bokeh_is_loading = css_urls.length + js_urls.length;\n\n    function on_load() {\n      root._bokeh_is_loading--;\n      if (root._bokeh_is_loading === 0) {\n        console.debug(\"Bokeh: all BokehJS libraries/stylesheets loaded\");\n        run_callbacks()\n      }\n    }\n\n    function on_error() {\n      console.error(\"failed to load \" + url);\n    }\n\n    for (var i = 0; i < css_urls.length; i++) {\n      var url = css_urls[i];\n      const element = document.createElement(\"link\");\n      element.onload = on_load;\n      element.onerror = on_error;\n      element.rel = \"stylesheet\";\n      element.type = \"text/css\";\n      element.href = url;\n      console.debug(\"Bokeh: injecting link tag for BokehJS stylesheet: \", url);\n      document.body.appendChild(element);\n    }\n\n    var skip = [];\n    if (window.requirejs) {\n      window.requirejs.config({'paths': {'plotly': 'https://cdn.plot.ly/plotly-latest.min'}});\n      require([], function() {\n      })\n    }\n    if (((window['Plotly'] !== undefined) && (!(window['Plotly'] instanceof HTMLElement))) || window.requirejs) {\n      var urls = ['https://cdn.plot.ly/plotly-latest.min.js'];\n      for (var i = 0; i < urls.length; i++) {\n        skip.push(urls[i])\n      }\n    }\n    for (var i = 0; i < js_urls.length; i++) {\n      var url = js_urls[i];\n      if (skip.indexOf(url) >= 0) { on_load(); continue; }\n      var element = document.createElement('script');\n      element.onload = on_load;\n      element.onerror = on_error;\n      element.async = false;\n      element.src = url;\n      console.debug(\"Bokeh: injecting script tag for BokehJS library: \", url);\n      document.head.appendChild(element);\n    }\n\tif (!js_urls.length) {\n      on_load()\n    }\n  };\n\n  function inject_raw_css(css) {\n    const element = document.createElement(\"style\");\n    element.appendChild(document.createTextNode(css));\n    document.body.appendChild(element);\n  }\n\n  var js_urls = [\"https://code.jquery.com/jquery-3.4.1.min.js\", \"https://cdn.plot.ly/plotly-latest.min.js\", \"https://cdn.bokeh.org/bokeh/release/bokeh-2.2.3.min.js\", \"https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.2.3.min.js\", \"https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.2.3.min.js\", \"https://unpkg.com/@holoviz/panel@^0.10.3/dist/panel.min.js\"];\n  var css_urls = [\"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/alerts.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/card.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/dataframe.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/json.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/markdown.css\", \"https://unpkg.com/@holoviz/panel@0.10.3/dist/css/widgets.css\"];\n\n  var inline_js = [\n    function(Bokeh) {\n      Bokeh.set_log_level(\"info\");\n    },\n    function(Bokeh) {} // ensure no trailing comma for IE\n  ];\n\n  function run_inline_js() {\n    if ((root.Bokeh !== undefined) || (force === true)) {\n      for (var i = 0; i < inline_js.length; i++) {\n        inline_js[i].call(root, root.Bokeh);\n      }} else if (Date.now() < root._bokeh_timeout) {\n      setTimeout(run_inline_js, 100);\n    } else if (!root._bokeh_failed_load) {\n      console.log(\"Bokeh: BokehJS failed to load within specified timeout.\");\n      root._bokeh_failed_load = true;\n    }\n  }\n\n  if (root._bokeh_is_loading === 0) {\n    console.debug(\"Bokeh: BokehJS loaded, going straight to plotting\");\n    run_inline_js();\n  } else {\n    load_libs(css_urls, js_urls, function() {\n      console.debug(\"Bokeh: BokehJS plotting callback run at\", now());\n      run_inline_js();\n    });\n  }\n}(window));"
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    },
-    {
-     "data": {
-      "application/javascript": [
-       "\n",
-       "if ((window.PyViz === undefined) || (window.PyViz instanceof HTMLElement)) {\n",
-       "  window.PyViz = {comms: {}, comm_status:{}, kernels:{}, receivers: {}, plot_index: []}\n",
-       "}\n",
-       "\n",
-       "\n",
-       "    function JupyterCommManager() {\n",
-       "    }\n",
-       "\n",
-       "    JupyterCommManager.prototype.register_target = function(plot_id, comm_id, msg_handler) {\n",
-       "      if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {\n",
-       "        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;\n",
-       "        comm_manager.register_target(comm_id, function(comm) {\n",
-       "          comm.on_msg(msg_handler);\n",
-       "        });\n",
-       "      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {\n",
-       "        window.PyViz.kernels[plot_id].registerCommTarget(comm_id, function(comm) {\n",
-       "          comm.onMsg = msg_handler;\n",
-       "        });\n",
-       "      } else if (typeof google != 'undefined' && google.colab.kernel != null) {\n",
-       "        google.colab.kernel.comms.registerTarget(comm_id, (comm) => {\n",
-       "          var messages = comm.messages[Symbol.asyncIterator]();\n",
-       "          function processIteratorResult(result) {\n",
-       "            var message = result.value;\n",
-       "            console.log(message)\n",
-       "            var content = {data: message.data, comm_id};\n",
-       "            var buffers = []\n",
-       "            for (var buffer of message.buffers || []) {\n",
-       "              buffers.push(new DataView(buffer))\n",
-       "            }\n",
-       "            var metadata = message.metadata || {};\n",
-       "            var msg = {content, buffers, metadata}\n",
-       "            msg_handler(msg);\n",
-       "            return messages.next().then(processIteratorResult);\n",
-       "          }\n",
-       "          return messages.next().then(processIteratorResult);\n",
-       "        })\n",
-       "      }\n",
-       "    }\n",
-       "\n",
-       "    JupyterCommManager.prototype.get_client_comm = function(plot_id, comm_id, msg_handler) {\n",
-       "      if (comm_id in window.PyViz.comms) {\n",
-       "        return window.PyViz.comms[comm_id];\n",
-       "      } else if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {\n",
-       "        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;\n",
-       "        var comm = comm_manager.new_comm(comm_id, {}, {}, {}, comm_id);\n",
-       "        if (msg_handler) {\n",
-       "          comm.on_msg(msg_handler);\n",
-       "        }\n",
-       "      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {\n",
-       "        var comm = window.PyViz.kernels[plot_id].connectToComm(comm_id);\n",
-       "        comm.open();\n",
-       "        if (msg_handler) {\n",
-       "          comm.onMsg = msg_handler;\n",
-       "        }\n",
-       "      } else if (typeof google != 'undefined' && google.colab.kernel != null) {\n",
-       "        var comm_promise = google.colab.kernel.comms.open(comm_id)\n",
-       "        comm_promise.then((comm) => {\n",
-       "          window.PyViz.comms[comm_id] = comm;\n",
-       "          if (msg_handler) {\n",
-       "            var messages = comm.messages[Symbol.asyncIterator]();\n",
-       "            function processIteratorResult(result) {\n",
-       "              var message = result.value;\n",
-       "              var content = {data: message.data};\n",
-       "              var metadata = message.metadata || {comm_id};\n",
-       "              var msg = {content, metadata}\n",
-       "              msg_handler(msg);\n",
-       "              return messages.next().then(processIteratorResult);\n",
-       "            }\n",
-       "            return messages.next().then(processIteratorResult);\n",
-       "          }\n",
-       "        }) \n",
-       "        var sendClosure = (data, metadata, buffers, disposeOnDone) => {\n",
-       "          return comm_promise.then((comm) => {\n",
-       "            comm.send(data, metadata, buffers, disposeOnDone);\n",
-       "          });\n",
-       "        };\n",
-       "        var comm = {\n",
-       "          send: sendClosure\n",
-       "        };\n",
-       "      }\n",
-       "      window.PyViz.comms[comm_id] = comm;\n",
-       "      return comm;\n",
-       "    }\n",
-       "    window.PyViz.comm_manager = new JupyterCommManager();\n",
-       "    \n",
-       "\n",
-       "\n",
-       "var JS_MIME_TYPE = 'application/javascript';\n",
-       "var HTML_MIME_TYPE = 'text/html';\n",
-       "var EXEC_MIME_TYPE = 'application/vnd.holoviews_exec.v0+json';\n",
-       "var CLASS_NAME = 'output';\n",
-       "\n",
-       "/**\n",
-       " * Render data to the DOM node\n",
-       " */\n",
-       "function render(props, node) {\n",
-       "  var div = document.createElement(\"div\");\n",
-       "  var script = document.createElement(\"script\");\n",
-       "  node.appendChild(div);\n",
-       "  node.appendChild(script);\n",
-       "}\n",
-       "\n",
-       "/**\n",
-       " * Handle when a new output is added\n",
-       " */\n",
-       "function handle_add_output(event, handle) {\n",
-       "  var output_area = handle.output_area;\n",
-       "  var output = handle.output;\n",
-       "  if ((output.data == undefined) || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {\n",
-       "    return\n",
-       "  }\n",
-       "  var id = output.metadata[EXEC_MIME_TYPE][\"id\"];\n",
-       "  var toinsert = output_area.element.find(\".\" + CLASS_NAME.split(' ')[0]);\n",
-       "  if (id !== undefined) {\n",
-       "    var nchildren = toinsert.length;\n",
-       "    var html_node = toinsert[nchildren-1].children[0];\n",
-       "    html_node.innerHTML = output.data[HTML_MIME_TYPE];\n",
-       "    var scripts = [];\n",
-       "    var nodelist = html_node.querySelectorAll(\"script\");\n",
-       "    for (var i in nodelist) {\n",
-       "      if (nodelist.hasOwnProperty(i)) {\n",
-       "        scripts.push(nodelist[i])\n",
-       "      }\n",
-       "    }\n",
-       "\n",
-       "    scripts.forEach( function (oldScript) {\n",
-       "      var newScript = document.createElement(\"script\");\n",
-       "      var attrs = [];\n",
-       "      var nodemap = oldScript.attributes;\n",
-       "      for (var j in nodemap) {\n",
-       "        if (nodemap.hasOwnProperty(j)) {\n",
-       "          attrs.push(nodemap[j])\n",
-       "        }\n",
-       "      }\n",
-       "      attrs.forEach(function(attr) { newScript.setAttribute(attr.name, attr.value) });\n",
-       "      newScript.appendChild(document.createTextNode(oldScript.innerHTML));\n",
-       "      oldScript.parentNode.replaceChild(newScript, oldScript);\n",
-       "    });\n",
-       "    if (JS_MIME_TYPE in output.data) {\n",
-       "      toinsert[nchildren-1].children[1].textContent = output.data[JS_MIME_TYPE];\n",
-       "    }\n",
-       "    output_area._hv_plot_id = id;\n",
-       "    if ((window.Bokeh !== undefined) && (id in Bokeh.index)) {\n",
-       "      window.PyViz.plot_index[id] = Bokeh.index[id];\n",
-       "    } else {\n",
-       "      window.PyViz.plot_index[id] = null;\n",
-       "    }\n",
-       "  } else if (output.metadata[EXEC_MIME_TYPE][\"server_id\"] !== undefined) {\n",
-       "    var bk_div = document.createElement(\"div\");\n",
-       "    bk_div.innerHTML = output.data[HTML_MIME_TYPE];\n",
-       "    var script_attrs = bk_div.children[0].attributes;\n",
-       "    for (var i = 0; i < script_attrs.length; i++) {\n",
-       "      toinsert[toinsert.length - 1].childNodes[1].setAttribute(script_attrs[i].name, script_attrs[i].value);\n",
-       "    }\n",
-       "    // store reference to server id on output_area\n",
-       "    output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE][\"server_id\"];\n",
-       "  }\n",
-       "}\n",
-       "\n",
-       "/**\n",
-       " * Handle when an output is cleared or removed\n",
-       " */\n",
-       "function handle_clear_output(event, handle) {\n",
-       "  var id = handle.cell.output_area._hv_plot_id;\n",
-       "  var server_id = handle.cell.output_area._bokeh_server_id;\n",
-       "  if (((id === undefined) || !(id in PyViz.plot_index)) && (server_id !== undefined)) { return; }\n",
-       "  var comm = window.PyViz.comm_manager.get_client_comm(\"hv-extension-comm\", \"hv-extension-comm\", function () {});\n",
-       "  if (server_id !== null) {\n",
-       "    comm.send({event_type: 'server_delete', 'id': server_id});\n",
-       "    return;\n",
-       "  } else if (comm !== null) {\n",
-       "    comm.send({event_type: 'delete', 'id': id});\n",
-       "  }\n",
-       "  delete PyViz.plot_index[id];\n",
-       "  if ((window.Bokeh !== undefined) & (id in window.Bokeh.index)) {\n",
-       "    var doc = window.Bokeh.index[id].model.document\n",
-       "    doc.clear();\n",
-       "    const i = window.Bokeh.documents.indexOf(doc);\n",
-       "    if (i > -1) {\n",
-       "      window.Bokeh.documents.splice(i, 1);\n",
-       "    }\n",
-       "  }\n",
-       "}\n",
-       "\n",
-       "/**\n",
-       " * Handle kernel restart event\n",
-       " */\n",
-       "function handle_kernel_cleanup(event, handle) {\n",
-       "  delete PyViz.comms[\"hv-extension-comm\"];\n",
-       "  window.PyViz.plot_index = {}\n",
-       "}\n",
-       "\n",
-       "/**\n",
-       " * Handle update_display_data messages\n",
-       " */\n",
-       "function handle_update_output(event, handle) {\n",
-       "  handle_clear_output(event, {cell: {output_area: handle.output_area}})\n",
-       "  handle_add_output(event, handle)\n",
-       "}\n",
-       "\n",
-       "function register_renderer(events, OutputArea) {\n",
-       "  function append_mime(data, metadata, element) {\n",
-       "    // create a DOM node to render to\n",
-       "    var toinsert = this.create_output_subarea(\n",
-       "    metadata,\n",
-       "    CLASS_NAME,\n",
-       "    EXEC_MIME_TYPE\n",
-       "    );\n",
-       "    this.keyboard_manager.register_events(toinsert);\n",
-       "    // Render to node\n",
-       "    var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};\n",
-       "    render(props, toinsert[0]);\n",
-       "    element.append(toinsert);\n",
-       "    return toinsert\n",
-       "  }\n",
-       "\n",
-       "  events.on('output_added.OutputArea', handle_add_output);\n",
-       "  events.on('output_updated.OutputArea', handle_update_output);\n",
-       "  events.on('clear_output.CodeCell', handle_clear_output);\n",
-       "  events.on('delete.Cell', handle_clear_output);\n",
-       "  events.on('kernel_ready.Kernel', handle_kernel_cleanup);\n",
-       "\n",
-       "  OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {\n",
-       "    safe: true,\n",
-       "    index: 0\n",
-       "  });\n",
-       "}\n",
-       "\n",
-       "if (window.Jupyter !== undefined) {\n",
-       "  try {\n",
-       "    var events = require('base/js/events');\n",
-       "    var OutputArea = require('notebook/js/outputarea').OutputArea;\n",
-       "    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {\n",
-       "      register_renderer(events, OutputArea);\n",
-       "    }\n",
-       "  } catch(err) {\n",
-       "  }\n",
-       "}\n"
-      ],
-      "application/vnd.holoviews_load.v0+json": "\nif ((window.PyViz === undefined) || (window.PyViz instanceof HTMLElement)) {\n  window.PyViz = {comms: {}, comm_status:{}, kernels:{}, receivers: {}, plot_index: []}\n}\n\n\n    function JupyterCommManager() {\n    }\n\n    JupyterCommManager.prototype.register_target = function(plot_id, comm_id, msg_handler) {\n      if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {\n        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;\n        comm_manager.register_target(comm_id, function(comm) {\n          comm.on_msg(msg_handler);\n        });\n      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {\n        window.PyViz.kernels[plot_id].registerCommTarget(comm_id, function(comm) {\n          comm.onMsg = msg_handler;\n        });\n      } else if (typeof google != 'undefined' && google.colab.kernel != null) {\n        google.colab.kernel.comms.registerTarget(comm_id, (comm) => {\n          var messages = comm.messages[Symbol.asyncIterator]();\n          function processIteratorResult(result) {\n            var message = result.value;\n            console.log(message)\n            var content = {data: message.data, comm_id};\n            var buffers = []\n            for (var buffer of message.buffers || []) {\n              buffers.push(new DataView(buffer))\n            }\n            var metadata = message.metadata || {};\n            var msg = {content, buffers, metadata}\n            msg_handler(msg);\n            return messages.next().then(processIteratorResult);\n          }\n          return messages.next().then(processIteratorResult);\n        })\n      }\n    }\n\n    JupyterCommManager.prototype.get_client_comm = function(plot_id, comm_id, msg_handler) {\n      if (comm_id in window.PyViz.comms) {\n        return window.PyViz.comms[comm_id];\n      } else if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {\n        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;\n        var comm = comm_manager.new_comm(comm_id, {}, {}, {}, comm_id);\n        if (msg_handler) {\n          comm.on_msg(msg_handler);\n        }\n      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {\n        var comm = window.PyViz.kernels[plot_id].connectToComm(comm_id);\n        comm.open();\n        if (msg_handler) {\n          comm.onMsg = msg_handler;\n        }\n      } else if (typeof google != 'undefined' && google.colab.kernel != null) {\n        var comm_promise = google.colab.kernel.comms.open(comm_id)\n        comm_promise.then((comm) => {\n          window.PyViz.comms[comm_id] = comm;\n          if (msg_handler) {\n            var messages = comm.messages[Symbol.asyncIterator]();\n            function processIteratorResult(result) {\n              var message = result.value;\n              var content = {data: message.data};\n              var metadata = message.metadata || {comm_id};\n              var msg = {content, metadata}\n              msg_handler(msg);\n              return messages.next().then(processIteratorResult);\n            }\n            return messages.next().then(processIteratorResult);\n          }\n        }) \n        var sendClosure = (data, metadata, buffers, disposeOnDone) => {\n          return comm_promise.then((comm) => {\n            comm.send(data, metadata, buffers, disposeOnDone);\n          });\n        };\n        var comm = {\n          send: sendClosure\n        };\n      }\n      window.PyViz.comms[comm_id] = comm;\n      return comm;\n    }\n    window.PyViz.comm_manager = new JupyterCommManager();\n    \n\n\nvar JS_MIME_TYPE = 'application/javascript';\nvar HTML_MIME_TYPE = 'text/html';\nvar EXEC_MIME_TYPE = 'application/vnd.holoviews_exec.v0+json';\nvar CLASS_NAME = 'output';\n\n/**\n * Render data to the DOM node\n */\nfunction render(props, node) {\n  var div = document.createElement(\"div\");\n  var script = document.createElement(\"script\");\n  node.appendChild(div);\n  node.appendChild(script);\n}\n\n/**\n * Handle when a new output is added\n */\nfunction handle_add_output(event, handle) {\n  var output_area = handle.output_area;\n  var output = handle.output;\n  if ((output.data == undefined) || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {\n    return\n  }\n  var id = output.metadata[EXEC_MIME_TYPE][\"id\"];\n  var toinsert = output_area.element.find(\".\" + CLASS_NAME.split(' ')[0]);\n  if (id !== undefined) {\n    var nchildren = toinsert.length;\n    var html_node = toinsert[nchildren-1].children[0];\n    html_node.innerHTML = output.data[HTML_MIME_TYPE];\n    var scripts = [];\n    var nodelist = html_node.querySelectorAll(\"script\");\n    for (var i in nodelist) {\n      if (nodelist.hasOwnProperty(i)) {\n        scripts.push(nodelist[i])\n      }\n    }\n\n    scripts.forEach( function (oldScript) {\n      var newScript = document.createElement(\"script\");\n      var attrs = [];\n      var nodemap = oldScript.attributes;\n      for (var j in nodemap) {\n        if (nodemap.hasOwnProperty(j)) {\n          attrs.push(nodemap[j])\n        }\n      }\n      attrs.forEach(function(attr) { newScript.setAttribute(attr.name, attr.value) });\n      newScript.appendChild(document.createTextNode(oldScript.innerHTML));\n      oldScript.parentNode.replaceChild(newScript, oldScript);\n    });\n    if (JS_MIME_TYPE in output.data) {\n      toinsert[nchildren-1].children[1].textContent = output.data[JS_MIME_TYPE];\n    }\n    output_area._hv_plot_id = id;\n    if ((window.Bokeh !== undefined) && (id in Bokeh.index)) {\n      window.PyViz.plot_index[id] = Bokeh.index[id];\n    } else {\n      window.PyViz.plot_index[id] = null;\n    }\n  } else if (output.metadata[EXEC_MIME_TYPE][\"server_id\"] !== undefined) {\n    var bk_div = document.createElement(\"div\");\n    bk_div.innerHTML = output.data[HTML_MIME_TYPE];\n    var script_attrs = bk_div.children[0].attributes;\n    for (var i = 0; i < script_attrs.length; i++) {\n      toinsert[toinsert.length - 1].childNodes[1].setAttribute(script_attrs[i].name, script_attrs[i].value);\n    }\n    // store reference to server id on output_area\n    output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE][\"server_id\"];\n  }\n}\n\n/**\n * Handle when an output is cleared or removed\n */\nfunction handle_clear_output(event, handle) {\n  var id = handle.cell.output_area._hv_plot_id;\n  var server_id = handle.cell.output_area._bokeh_server_id;\n  if (((id === undefined) || !(id in PyViz.plot_index)) && (server_id !== undefined)) { return; }\n  var comm = window.PyViz.comm_manager.get_client_comm(\"hv-extension-comm\", \"hv-extension-comm\", function () {});\n  if (server_id !== null) {\n    comm.send({event_type: 'server_delete', 'id': server_id});\n    return;\n  } else if (comm !== null) {\n    comm.send({event_type: 'delete', 'id': id});\n  }\n  delete PyViz.plot_index[id];\n  if ((window.Bokeh !== undefined) & (id in window.Bokeh.index)) {\n    var doc = window.Bokeh.index[id].model.document\n    doc.clear();\n    const i = window.Bokeh.documents.indexOf(doc);\n    if (i > -1) {\n      window.Bokeh.documents.splice(i, 1);\n    }\n  }\n}\n\n/**\n * Handle kernel restart event\n */\nfunction handle_kernel_cleanup(event, handle) {\n  delete PyViz.comms[\"hv-extension-comm\"];\n  window.PyViz.plot_index = {}\n}\n\n/**\n * Handle update_display_data messages\n */\nfunction handle_update_output(event, handle) {\n  handle_clear_output(event, {cell: {output_area: handle.output_area}})\n  handle_add_output(event, handle)\n}\n\nfunction register_renderer(events, OutputArea) {\n  function append_mime(data, metadata, element) {\n    // create a DOM node to render to\n    var toinsert = this.create_output_subarea(\n    metadata,\n    CLASS_NAME,\n    EXEC_MIME_TYPE\n    );\n    this.keyboard_manager.register_events(toinsert);\n    // Render to node\n    var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};\n    render(props, toinsert[0]);\n    element.append(toinsert);\n    return toinsert\n  }\n\n  events.on('output_added.OutputArea', handle_add_output);\n  events.on('output_updated.OutputArea', handle_update_output);\n  events.on('clear_output.CodeCell', handle_clear_output);\n  events.on('delete.Cell', handle_clear_output);\n  events.on('kernel_ready.Kernel', handle_kernel_cleanup);\n\n  OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {\n    safe: true,\n    index: 0\n  });\n}\n\nif (window.Jupyter !== undefined) {\n  try {\n    var events = require('base/js/events');\n    var OutputArea = require('notebook/js/outputarea').OutputArea;\n    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {\n      register_renderer(events, OutputArea);\n    }\n  } catch(err) {\n  }\n}\n"
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    }
-   ],
-   "source": [
-    "import numpy as np\n",
-    "import panel as pn\n",
-    "pn.extension('plotly')\n",
-    "import pandas as pd\n",
-    "import plotly.io as pio\n",
-    "pio.renderers.default='iframe'\n",
-    "# import locale\n",
-    "\n",
-    "# locale.setlocale(locale.LC_ALL, 'th_TH')\n",
-    "pd.set_option('display.max_columns', None)\n",
-    "pd.set_option('display.max_rows', None)\n",
-    "\n",
-    "envi_df = pd.read_excel(\"D:/Onedrive(work)\\OneDrive - Thailand Institute of Nuclear Technology(Public Organizaion)/Documents/Management/แผนปฏิบัติงาน/2564/(ทีม4)ส่วนงานสิ่งแวดล้อม/Data collection 2020 V3 edit GPS 02-03-64(corrected).xlsx\", sheet_name=\"ข้อมูลสิ่งแวดล้อม 2563\", usecols=\"A:I\")\n",
-    "GPS_df = pd.read_excel(\"D:/Onedrive(work)\\OneDrive - Thailand Institute of Nuclear Technology(Public Organizaion)/Documents/Management/แผนปฏิบัติงาน/2564/(ทีม4)ส่วนงานสิ่งแวดล้อม/Data collection 2020 V3 edit GPS 02-03-64(corrected).xlsx\", sheet_name=\"ข้อมูลสิ่งแวดล้อม 2563\", usecols=\"M:P\",index_col=[0,1])\n",
-    "envi_df=envi_df.drop_duplicates()\n",
-    "GPS_df=GPS_df.drop_duplicates()\n",
-    "# envi_df.head()\n",
-    "# GPS_df.head()\n",
-    "result = envi_df.join(GPS_df,on=['Place','Site'], how='inner')"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 34,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/html": [
-       "<iframe\n",
-       "    scrolling=\"no\"\n",
-       "    width=\"100%\"\n",
-       "    height=\"545px\"\n",
-       "    src=\"iframe_figures/figure_34.html\"\n",
-       "    frameborder=\"0\"\n",
-       "    allowfullscreen\n",
-       "></iframe>\n"
-      ]
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    }
-   ],
-   "source": [
-    "import plotly.express as px\n",
-    "\n",
-    "token = open(\".mapbox_token\").read()\n",
-    "place_map = px.scatter_mapbox(result, lat=\"Latitude\", lon=\"Longitude\", hover_name=\"Place\", hover_data=[\"Site\",\"ชนิดตัวอย่าง\",\"สิ่งตรวจวัด\",\"หน่วย\"],\n",
-    "                        color_continuous_scale=px.colors.sequential.Agsunset, zoom=8, color='ค่านับวัด',size='ค่านับวัด', title=\"แผนที่จุดเก็บตัวอย่าง\")\n",
-    "place_map.update_layout(mapbox_style=\"open-street-map\", mapbox_accesstoken=token)\n",
-    "place_map.update_layout(margin={\"r\":0,\"t\":35,\"l\":0,\"b\":0},paper_bgcolor=\"white\",font={\"color\":\"black\"})"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 35,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "\n",
-    "\n",
-    "def check(site,sample):\n",
-    "    df = result.set_index(['Site', 'ชนิดตัวอย่าง'])\n",
-    "    for i in df.index.unique().tolist():\n",
-    "        if i[0] == site:\n",
-    "            if i[1]==sample and i[0]==site :\n",
-    "                return True\n",
-    "    return False"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 41,
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Dash app running on http://127.0.0.1:8050/\n"
-     ]
-    }
-   ],
-   "source": [
-    "import plotly\n",
-    "import plotly.graph_objects as go \n",
-    "# import dash\n",
-    "from jupyter_dash import JupyterDash\n",
-    "import dash_core_components as dcc\n",
-    "import dash_html_components as html\n",
-    "from dash.dependencies import Input, Output\n",
-    "\n",
-    "external_stylesheets=[{'crossorigin':'anonymous','rel':'stylesheet','href':\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\"}]\n",
-    "\n",
-    "app = JupyterDash(__name__,external_stylesheets=external_stylesheets)\n",
-    "# app = dash.Dash(__name__)\n",
-    "site_indicators = result['Site'].unique().tolist()\n",
-    "all_options={}\n",
-    "config={\"editable\":True, \"edits\":{\"shapePosition\": False}, #\"scrollZoom\": False,\n",
-    "    'modeBarButtonsToAdd':['drawline',\n",
-    "#                                         'drawopenpath',\n",
-    "#                                         'drawclosedpath',\n",
-    "                                        'drawcircle',\n",
-    "                                        'drawrect',\n",
-    "                                        'eraseshape'\n",
-    "                                       ],\n",
-    "       'modeBarButtonsToRemove':['lasso2d',\n",
-    "#                                         'drawopenpath',\n",
-    "#                                         'drawclosedpath',\n",
-    "                                        'zoomIn2d',\n",
-    "                                        'zoomOut2d',\n",
-    "                                       ]}\n",
-    "for i in site_indicators:\n",
-    "    all_options[i]=result['ชนิดตัวอย่าง'][result['Site']==i].unique()\n",
-    "app.layout = html.Div( children=[\n",
-    "    html.Div(className=\"w3-bar w3-top  w3-large w3-amber\", style={\"z-index\":4}, children=[\n",
-    "       html.Button(\" Menu\", id=\"open-menu-button\", n_clicks=0, className=\n",
-    "                \"w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey fa fa-bars\"),\n",
-    "        html.Span(' กัมมันตภาพรังสีในสิ่งแวดล้อมรอบ สทน. ทั้ง 3 แห่ง', className='w3-bar-item w3-right fa fa-dashboard fa-lg')]\n",
-    "    ),  \n",
-    "    html.Nav(id=\"mySidebar\", className=\"w3-mobile w3-sidebar w3-collapse w3-sand w3-animate-left\", style={\"z-index\":4, \"width\":\"200px\"}, children=[\n",
-    "#         html.Button(\"Close &times\", id=\"close-menu-button\", n_clicks=0, className=\"w3-bar-item w3-button w3-large w3-hide-large\"),\n",
-    "        html.Div(className=\"w3-container\", children=[\n",
-    "#             html.I(className=\"fa fa-institution\"),\n",
-    "            html.Span(\" สาขา\",className=\"fa fa-institution\")\n",
-    "        ]),\n",
-    "        html.Div(className=\"w3-bar-block\", children=[\n",
-    "           html.Div(className=\"w3-bar-item\", children=[ \n",
-    "                dcc.RadioItems(\n",
-    "                    id='site-radio',\n",
-    "                    options=[{'label': i, 'value': i} for i in all_options.keys()],\n",
-    "                    value='คลองห้า',\n",
-    "                    labelStyle={'display':'block'}\n",
-    "                )\n",
-    "           ]),\n",
-    "           html.Div(className=\"w3-container\", children=[ \n",
-    "#                html.I(className=\"fa fa-flask\"),\n",
-    "               html.Span(\" ชนิดตัวอย่าง\",className=\"fa fa-flask\")\n",
-    "           ]),\n",
-    "           html.Div(className='w3-bar-block w3-padding', children=[ \n",
-    "                dcc.Dropdown(id='sample-dropdown',clearable=False)\n",
-    "           ])\n",
-    "        ])\n",
-    "    ]),  \n",
-    "    html.Div(className=\"w3-main\",style={'margin-left':200, 'margin-top':43}, children=[\n",
-    "        html.Div(className=\"w3-row-padding  w3-margin-bottom\", children=[\n",
-    "            html.Div(className=\"w3-half\", children=[\n",
-    "                html.Div(className=\"w3-container w3-card w3-animate-top w3-padding-16\", children=[\n",
-    "                    dcc.Graph(config=config,id='fig_1')\n",
-    "                ])\n",
-    "            ]),        \n",
-    "            html.Div(className=\"w3-half\", children=[\n",
-    "                html.Div(className=\"w3-container w3-card w3-animate-top  w3-padding-16\", children=[\n",
-    "                    dcc.Graph(config=config,id='fig_2')\n",
-    "                ])\n",
-    "            ])\n",
-    "        ]),\n",
-    "        html.Div(className=\"w3-card w3-animate-right w3-margin-top w3-margin-bottom w3-padding-small\",children=[dcc.Graph(figure=place_map)]),\n",
-    "        html.Div(\n",
-    "            html.Span(className=\"w3-bar-item  w3-text-grey w3-light-grey w3-right\", children=\n",
-    "                \"สำรวจและจัดทำโดย: ฝ่ายความปลอดภัยด้านนิวเคลียร์ สถาบันเทคโนโลยีนิวเคลียร์แห่งชาติ (องค์การมหาชน)\"),\n",
-    "            className=\"w3-bar w3-panel w3-bottom\"\n",
-    "        )    \n",
-    "        \n",
-    "    ])\n",
-    "    \n",
-    "])        \n",
-    "    \n",
-    "@app.callback(\n",
-    "    Output('mySidebar','style'),\n",
-    "    Input('open-menu-button', 'n_clicks')\n",
-    ")\n",
-    "def update_style(n_clicks):\n",
-    "    if n_clicks%2 == 1:\n",
-    "        return {'display':'block'}\n",
-    "    else:\n",
-    "        return {'display':'none'}\n",
-    "\n",
-    "@app.callback(\n",
-    "    Output('sample-dropdown', 'options'),\n",
-    "    Input('site-radio', 'value')\n",
-    ")\n",
-    "def set_sample_options(selected_site):\n",
-    "    return [{'label': i, 'value': i} for i in all_options[selected_site]]\n",
-    "\n",
-    "@app.callback(\n",
-    "    Output('sample-dropdown', 'value'),\n",
-    "    Input('sample-dropdown', 'options')\n",
-    ")\n",
-    "def set_sample_value(available_options):\n",
-    "    return available_options[0]['value']\n",
-    "\n",
-    "@app.callback(\n",
-    "    [Output('fig_1', 'figure'),\n",
-    "    Output('fig_2', 'figure')],\n",
-    "    [Input('site-radio', 'value'),\n",
-    "    Input('sample-dropdown', 'value')]\n",
-    ")\n",
-    "def update_figure(site_radio_name, sample_dropdown_name):    \n",
-    "        layout=go.Layout(\n",
-    "                hoverlabel=dict(\n",
-    "#                     bgcolor='white', #'rgba(200,200,200,1)',\n",
-    "                    font_size=14,\n",
-    "#                     font_color='black', #'rgba(150,255,255,1)',       \n",
-    "                ), #plot_bgcolor='rgba(253,245,230,1)', \n",
-    "                    yaxis=dict(showgrid=False),\n",
-    "                modebar=dict(orientation=\"v\")\n",
-    "            )\n",
-    "        fig1=go.Figure(layout=layout)\n",
-    "        fig2=go.Figure(layout=layout)\n",
-    "        for i in result['สิ่งตรวจวัด'][result['ชนิดตัวอย่าง']==sample_dropdown_name].unique(): \n",
-    "            a=result['หน่วย'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) & \\\n",
-    "                                                           (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)].tolist()\n",
-    "            b=result['วันที่เก็บตัวอย่าง'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) & \\\n",
-    "                                                           (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)].dt.strftime(\"%d %b %Y\").tolist()\n",
-    "            xx=result['สิ่งตรวจวัด'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) & \\\n",
-    "                                                            (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)]\n",
-    "            yy=result['ค่านับวัด'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) & \\\n",
-    "                                                           (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)]\n",
-    "            zz=result['อัตราปริมาณรังสีต่อปี'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) & \\\n",
-    "                                                           (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)]\n",
-    "            fig1.add_trace(go.Violin( x=xx,\n",
-    "                                    y=yy, \n",
-    "                           name=i, #scalegroup=\"สิ่งตรวจวัด\", \n",
-    "                           marker=dict(size=6, line=dict(width=0.5, color='black',outliercolor='white')), \n",
-    "                           box_visible=True, meanline_visible=True,meanline_color='white',\n",
-    "                           box_fillcolor='grey',box_line_color='black',line_width=1,points='all',jitter=0.5, \n",
-    "                           marker_symbol=\"diamond\", marker_line_color='black',\n",
-    "                           text = result['Place'][(result['สิ่งตรวจวัด']==i) & (result['Site']==site_radio_name) & (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0) ].tolist(),\n",
-    "                           customdata =np.stack((a,b),axis=1) , \n",
-    "                           hovertemplate=\"<b>%{text}</b><br><b>spec.activity: \\\n",
-    "</b>%{y} %{customdata[0]}<br><b>วันที่เก็บตัวอย่าง:</b> %{customdata[1]}\"))\n",
-    "            fig1.add_annotation(dict(text=\"Drag me to where you want.<br>Then edit me as you like.\", \n",
-    "                               clicktoshow=\"onoff\", visible=False,\n",
-    "                              x=i, y=yy.min(), arrowhead=3, arrowcolor='cyan'))\n",
-    "            aa =[\"uSv/y\" for c in a]\n",
-    "            fig2.add_trace(go.Violin( x=xx,\n",
-    "                                    y=zz, \n",
-    "                           name=i, #scalegroup=\"สิ่งตรวจวัด\", \n",
-    "                           marker=dict(size=6, line=dict(width=0.5, color='black',outliercolor='white')), \n",
-    "                           box_visible=True, meanline_visible=True,meanline_color='white',\n",
-    "                           box_fillcolor='grey',box_line_color='black',line_width=1,points='all',jitter=0.5, \n",
-    "                           marker_symbol=\"diamond\", marker_line_color='black',\n",
-    "                           text = result['Place'][(result['สิ่งตรวจวัด']==i) & (result['Site']==site_radio_name) & (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0) ].tolist(),\n",
-    "                           customdata =np.stack((aa,b),axis=-1) ,\n",
-    "                           hovertemplate=\"<b>%{text}</b><br><b>spec.activity: \\\n",
-    "</b>%{y} %{customdata[0]}<br><b>วันที่เก็บตัวอย่าง:</b> %{customdata[1]}\"))\n",
-    "            fig2.add_annotation(dict(text=\"Drag me to where you want.<br>Then edit me as you like.\", \n",
-    "                               clicktoshow=\"onoff\", visible=False,\n",
-    "                              x=i, y=zz.min(), arrowhead=3, arrowcolor='cyan'))\n",
-    "        fig1.update_layout(\n",
-    "            title=sample_dropdown_name+site_radio_name + \" > Specific Activity\",\n",
-    "            margin=dict(l=0, r=50, t=30, b=50),\n",
-    "            font=dict(\n",
-    "                family=\"Rockwell Nova\",\n",
-    "                color=\"black\"\n",
-    "               # size=14\n",
-    "            ),\n",
-    "            hoverdistance=10,\n",
-    "            yaxis=dict(title='ค่านับวัด',zeroline=False), #, type=\"log\"),\n",
-    "            xaxis=dict(title='สิ่งตรวจวัด'),\n",
-    "            legend=dict(\n",
-    "                x=0.9,\n",
-    "                borderwidth=1,\n",
-    "#                 bordercolor=\"darkcyan\",\n",
-    "#                 bgcolor=\"darkslateblue\",\n",
-    "                itemclick='toggleothers'           \n",
-    "            ),\n",
-    "#             paper_bgcolor=\"darkslategrey\",\n",
-    "            dragmode='drawline',\n",
-    "                  # style of new shapes\n",
-    "            newshape=dict(line_color='red',\n",
-    "                                fillcolor='grey',\n",
-    "                                opacity=0.2,\n",
-    "                                #layer=\"below\",\n",
-    "                                line_width=2)\n",
-    "        )\n",
-    "        fig2.update_layout(\n",
-    "            title=sample_dropdown_name+site_radio_name + \" > Committed Effective Dose\",\n",
-    "            margin=dict(l=0, r=50, t=30, b=50),\n",
-    "            font=dict(\n",
-    "                family=\"Rockwell Nova\",\n",
-    "                color=\"black\"\n",
-    "               # size=14\n",
-    "            ),\n",
-    "            \n",
-    "            yaxis=dict(title='อัตราปริมาณรังสีต่อปี',zeroline=False), #, type=\"log\"),\n",
-    "            xaxis=dict(title='สิ่งตรวจวัด'),\n",
-    "            legend=dict(\n",
-    "                x=0.9,\n",
-    "                borderwidth=1,\n",
-    "#                 bordercolor=\"darkcyan\",\n",
-    "#                 bgcolor=\"darkslateblue\",\n",
-    "                itemclick='toggleothers'           \n",
-    "            ),\n",
-    "#             paper_bgcolor=\"darkslategrey\",\n",
-    "            dragmode='drawline',\n",
-    "                  # style of new shapes\n",
-    "            newshape=dict(line_color='red',\n",
-    "                                fillcolor='grey',\n",
-    "                                opacity=0.2,\n",
-    "                                #layer=\"below\",\n",
-    "                                line_width=2)\n",
-    "        )    \n",
-    "        return [fig1, fig2]\n",
-    "# if __name__ == '__main__':\n",
-    "app.run_server(mode=\"external\")"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.8.5"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 4
-}
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
+import numpy as np
+import panel as pn
+pn.extension('plotly')
+import pandas as pd
+import plotly.io as pio
+pio.renderers.default='iframe'
+# import locale
+
+# locale.setlocale(locale.LC_ALL, 'th_TH')
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+
+envi_df = pd.read_excel("D:/Onedrive(work)\OneDrive - Thailand Institute of Nuclear Technology(Public Organizaion)/Documents/Management/แผนปฏิบัติงาน/2564/(ทีม4)ส่วนงานสิ่งแวดล้อม/Data collection 2020 V3 edit GPS 02-03-64(corrected).xlsx", sheet_name="ข้อมูลสิ่งแวดล้อม 2563", usecols="A:I")
+GPS_df = pd.read_excel("D:/Onedrive(work)\OneDrive - Thailand Institute of Nuclear Technology(Public Organizaion)/Documents/Management/แผนปฏิบัติงาน/2564/(ทีม4)ส่วนงานสิ่งแวดล้อม/Data collection 2020 V3 edit GPS 02-03-64(corrected).xlsx", sheet_name="ข้อมูลสิ่งแวดล้อม 2563", usecols="M:P",index_col=[0,1])
+envi_df=envi_df.drop_duplicates()
+GPS_df=GPS_df.drop_duplicates()
+# envi_df.head()
+# GPS_df.head()
+result = envi_df.join(GPS_df,on=['Place','Site'], how='inner')
+
+
+# In[34]:
+
+
+import plotly.express as px
+
+token = open(".mapbox_token").read()
+place_map = px.scatter_mapbox(result, lat="Latitude", lon="Longitude", hover_name="Place", hover_data=["Site","ชนิดตัวอย่าง","สิ่งตรวจวัด","หน่วย"],
+                        color_continuous_scale=px.colors.sequential.Agsunset, zoom=8, color='ค่านับวัด',size='ค่านับวัด', title="แผนที่จุดเก็บตัวอย่าง")
+place_map.update_layout(mapbox_style="open-street-map", mapbox_accesstoken=token)
+place_map.update_layout(margin={"r":0,"t":35,"l":0,"b":0},paper_bgcolor="white",font={"color":"black"})
+
+
+# In[35]:
+
+
+
+
+def check(site,sample):
+    df = result.set_index(['Site', 'ชนิดตัวอย่าง'])
+    for i in df.index.unique().tolist():
+        if i[0] == site:
+            if i[1]==sample and i[0]==site :
+                return True
+    return False
+
+
+# In[41]:
+
+
+import plotly
+import plotly.graph_objects as go 
+# import dash
+from jupyter_dash import JupyterDash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+
+external_stylesheets=[{'crossorigin':'anonymous','rel':'stylesheet','href':"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"}]
+
+app = JupyterDash(__name__,external_stylesheets=external_stylesheets)
+# app = dash.Dash(__name__)
+server = app.server
+site_indicators = result['Site'].unique().tolist()
+all_options={}
+config={"editable":True, "edits":{"shapePosition": False}, #"scrollZoom": False,
+    'modeBarButtonsToAdd':['drawline',
+#                                         'drawopenpath',
+#                                         'drawclosedpath',
+                                        'drawcircle',
+                                        'drawrect',
+                                        'eraseshape'
+                                       ],
+       'modeBarButtonsToRemove':['lasso2d',
+#                                         'drawopenpath',
+#                                         'drawclosedpath',
+                                        'zoomIn2d',
+                                        'zoomOut2d',
+                                       ]}
+for i in site_indicators:
+    all_options[i]=result['ชนิดตัวอย่าง'][result['Site']==i].unique()
+app.layout = html.Div( children=[
+    html.Div(className="w3-bar w3-top  w3-large w3-amber", style={"z-index":4}, children=[
+       html.Button(" Menu", id="open-menu-button", n_clicks=0, className=
+                "w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey fa fa-bars"),
+        html.Span(' กัมมันตภาพรังสีในสิ่งแวดล้อมรอบ สทน. ทั้ง 3 แห่ง', className='w3-bar-item w3-right fa fa-dashboard fa-lg')]
+    ),  
+    html.Nav(id="mySidebar", className="w3-mobile w3-sidebar w3-collapse w3-sand w3-animate-left", style={"z-index":4, "width":"200px"}, children=[
+#         html.Button("Close &times", id="close-menu-button", n_clicks=0, className="w3-bar-item w3-button w3-large w3-hide-large"),
+        html.Div(className="w3-container", children=[
+#             html.I(className="fa fa-institution"),
+            html.Span(" สาขา",className="fa fa-institution")
+        ]),
+        html.Div(className="w3-bar-block", children=[
+           html.Div(className="w3-bar-item", children=[ 
+                dcc.RadioItems(
+                    id='site-radio',
+                    options=[{'label': i, 'value': i} for i in all_options.keys()],
+                    value='คลองห้า',
+                    labelStyle={'display':'block'}
+                )
+           ]),
+           html.Div(className="w3-container", children=[ 
+#                html.I(className="fa fa-flask"),
+               html.Span(" ชนิดตัวอย่าง",className="fa fa-flask")
+           ]),
+           html.Div(className='w3-bar-block w3-padding', children=[ 
+                dcc.Dropdown(id='sample-dropdown',clearable=False)
+           ])
+        ])
+    ]),  
+    html.Div(className="w3-main",style={'margin-left':200, 'margin-top':43}, children=[
+        html.Div(className="w3-row-padding  w3-margin-bottom", children=[
+            html.Div(className="w3-half", children=[
+                html.Div(className="w3-container w3-card w3-animate-top w3-padding-16", children=[
+                    dcc.Graph(config=config,id='fig_1')
+                ])
+            ]),        
+            html.Div(className="w3-half", children=[
+                html.Div(className="w3-container w3-card w3-animate-top  w3-padding-16", children=[
+                    dcc.Graph(config=config,id='fig_2')
+                ])
+            ])
+        ]),
+        html.Div(className="w3-card w3-animate-right w3-margin-top w3-margin-bottom w3-padding-small",children=[dcc.Graph(figure=place_map)]),
+        html.Div(
+            html.Span(className="w3-bar-item  w3-text-grey w3-light-grey w3-right", children=
+                "สำรวจและจัดทำโดย: ฝ่ายความปลอดภัยด้านนิวเคลียร์ สถาบันเทคโนโลยีนิวเคลียร์แห่งชาติ (องค์การมหาชน)"),
+            className="w3-bar w3-panel w3-bottom"
+        )    
+        
+    ])
+    
+])        
+    
+@app.callback(
+    Output('mySidebar','style'),
+    Input('open-menu-button', 'n_clicks')
+)
+def update_style(n_clicks):
+    if n_clicks%2 == 1:
+        return {'display':'block'}
+    else:
+        return {'display':'none'}
+
+@app.callback(
+    Output('sample-dropdown', 'options'),
+    Input('site-radio', 'value')
+)
+def set_sample_options(selected_site):
+    return [{'label': i, 'value': i} for i in all_options[selected_site]]
+
+@app.callback(
+    Output('sample-dropdown', 'value'),
+    Input('sample-dropdown', 'options')
+)
+def set_sample_value(available_options):
+    return available_options[0]['value']
+
+@app.callback(
+    [Output('fig_1', 'figure'),
+    Output('fig_2', 'figure')],
+    [Input('site-radio', 'value'),
+    Input('sample-dropdown', 'value')]
+)
+def update_figure(site_radio_name, sample_dropdown_name):    
+        layout=go.Layout(
+                hoverlabel=dict(
+#                     bgcolor='white', #'rgba(200,200,200,1)',
+                    font_size=14,
+#                     font_color='black', #'rgba(150,255,255,1)',       
+                ), #plot_bgcolor='rgba(253,245,230,1)', 
+                    yaxis=dict(showgrid=False),
+                modebar=dict(orientation="v")
+            )
+        fig1=go.Figure(layout=layout)
+        fig2=go.Figure(layout=layout)
+        for i in result['สิ่งตรวจวัด'][result['ชนิดตัวอย่าง']==sample_dropdown_name].unique(): 
+            a=result['หน่วย'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) &                                                            (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)].tolist()
+            b=result['วันที่เก็บตัวอย่าง'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) &                                                            (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)].dt.strftime("%d %b %Y").tolist()
+            xx=result['สิ่งตรวจวัด'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) &                                                             (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)]
+            yy=result['ค่านับวัด'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) &                                                            (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)]
+            zz=result['อัตราปริมาณรังสีต่อปี'][(result['Site']==site_radio_name) & (result['สิ่งตรวจวัด']==i) &                                                            (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0)]
+            fig1.add_trace(go.Violin( x=xx,
+                                    y=yy, 
+                           name=i, #scalegroup="สิ่งตรวจวัด", 
+                           marker=dict(size=6, line=dict(width=0.5, color='black',outliercolor='white')), 
+                           box_visible=True, meanline_visible=True,meanline_color='white',
+                           box_fillcolor='grey',box_line_color='black',line_width=1,points='all',jitter=0.5, 
+                           marker_symbol="diamond", marker_line_color='black',
+                           text = result['Place'][(result['สิ่งตรวจวัด']==i) & (result['Site']==site_radio_name) & (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0) ].tolist(),
+                           customdata =np.stack((a,b),axis=1) , 
+                           hovertemplate="<b>%{text}</b><br><b>spec.activity: \
+</b>%{y} %{customdata[0]}<br><b>วันที่เก็บตัวอย่าง:</b> %{customdata[1]}"))
+            fig1.add_annotation(dict(text="Drag me to where you want.<br>Then edit me as you like.", 
+                               clicktoshow="onoff", visible=False,
+                              x=i, y=yy.min(), arrowhead=3, arrowcolor='cyan'))
+            aa =["uSv/y" for c in a]
+            fig2.add_trace(go.Violin( x=xx,
+                                    y=zz, 
+                           name=i, #scalegroup="สิ่งตรวจวัด", 
+                           marker=dict(size=6, line=dict(width=0.5, color='black',outliercolor='white')), 
+                           box_visible=True, meanline_visible=True,meanline_color='white',
+                           box_fillcolor='grey',box_line_color='black',line_width=1,points='all',jitter=0.5, 
+                           marker_symbol="diamond", marker_line_color='black',
+                           text = result['Place'][(result['สิ่งตรวจวัด']==i) & (result['Site']==site_radio_name) & (result['ชนิดตัวอย่าง']==sample_dropdown_name) & (result['ค่านับวัด']>0) ].tolist(),
+                           customdata =np.stack((aa,b),axis=-1) ,
+                           hovertemplate="<b>%{text}</b><br><b>spec.activity: \
+</b>%{y} %{customdata[0]}<br><b>วันที่เก็บตัวอย่าง:</b> %{customdata[1]}"))
+            fig2.add_annotation(dict(text="Drag me to where you want.<br>Then edit me as you like.", 
+                               clicktoshow="onoff", visible=False,
+                              x=i, y=zz.min(), arrowhead=3, arrowcolor='cyan'))
+        fig1.update_layout(
+            title=sample_dropdown_name+site_radio_name + " > Specific Activity",
+            margin=dict(l=0, r=50, t=30, b=50),
+            font=dict(
+                family="Rockwell Nova",
+                color="black"
+               # size=14
+            ),
+            hoverdistance=10,
+            yaxis=dict(title='ค่านับวัด',zeroline=False), #, type="log"),
+            xaxis=dict(title='สิ่งตรวจวัด'),
+            legend=dict(
+                x=0.9,
+                borderwidth=1,
+#                 bordercolor="darkcyan",
+#                 bgcolor="darkslateblue",
+                itemclick='toggleothers'           
+            ),
+#             paper_bgcolor="darkslategrey",
+            dragmode='drawline',
+                  # style of new shapes
+            newshape=dict(line_color='red',
+                                fillcolor='grey',
+                                opacity=0.2,
+                                #layer="below",
+                                line_width=2)
+        )
+        fig2.update_layout(
+            title=sample_dropdown_name+site_radio_name + " > Committed Effective Dose",
+            margin=dict(l=0, r=50, t=30, b=50),
+            font=dict(
+                family="Rockwell Nova",
+                color="black"
+               # size=14
+            ),
+            
+            yaxis=dict(title='อัตราปริมาณรังสีต่อปี',zeroline=False), #, type="log"),
+            xaxis=dict(title='สิ่งตรวจวัด'),
+            legend=dict(
+                x=0.9,
+                borderwidth=1,
+#                 bordercolor="darkcyan",
+#                 bgcolor="darkslateblue",
+                itemclick='toggleothers'           
+            ),
+#             paper_bgcolor="darkslategrey",
+            dragmode='drawline',
+                  # style of new shapes
+            newshape=dict(line_color='red',
+                                fillcolor='grey',
+                                opacity=0.2,
+                                #layer="below",
+                                line_width=2)
+        )    
+        return [fig1, fig2]
+if __name__ == '__main__':
+app.run_server(debug=True)
+
